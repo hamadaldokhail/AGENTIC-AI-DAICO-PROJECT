@@ -124,5 +124,5 @@ sending traces to the `daico-navigator` project.
 ## Acknowledgements
 
 Completed under the **SDAIA Academy** programme *Building Agentic AI Systems* at the **DAICO** center,
-King Saud University, sponsored by **SDAIA**. See SDAIA Academy on GitHub: <https://github.com/SDAIA-Academy>.
+King Saud University, sponsored by **SDAIA**. See SDAIA Academy on GitHub: <https://github.com/SDAIAAcademy>.
 Course materials: <https://mohammadyusif.github.io/agentic-ai-systems/>.
