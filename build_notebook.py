@@ -26,9 +26,9 @@ md(r'''# DAICO Navigator - an Agentic AI Assistant for the DAICO Center
 
 **Team:**
 - Hamed Ahmed Aldkhyyal
-- Saif Fawaz Alanzi
+- Saif Fawaz Alanazi
 - Fahad Abdullah Alanazi
-- Yousef Farhan Alanzi
+- Yousef Saleh Alanzi
 
 ---
 
@@ -482,7 +482,7 @@ print("daico_navigator entrypoint ready.")''')
 code(r'''# --- Fire the interrupt: the run PAUSES awaiting human approval ---
 enroll_cfg = {"configurable": {"thread_id": "enroll-demo-1"}}
 paused = daico_navigator.invoke(
-    {"user_id": "saif", "question": "I'd like to enroll in ML-201. My name is Saif Fawaz Alanzi."},
+    {"user_id": "saif", "question": "I'd like to enroll in ML-201. My name is Saif Fawaz Alanazi."},
     enroll_cfg,
 )
 assert "__interrupt__" in paused, "expected an interrupt"

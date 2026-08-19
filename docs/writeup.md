@@ -5,7 +5,7 @@ One paragraph per rubric section. Every claim below is backed by captured output
 
 **Programme:** SDAIA Academy - *Building Agentic AI Systems*, DAICO / King Saud University, sponsored by SDAIA.
 **Cohort:** 16-20 August 2026. **Declared track:** Track A - Supervisor (with a Track B human handoff).
-**Team:** Hamed Ahmed Aldkhyyal, Saif Fawaz Alanzi, Fahad Abdullah Alanazi, Yousef Farhan Alanzi.
+**Team:** Hamed Ahmed Aldkhyyal, Saif Fawaz Alanazi, Fahad Abdullah Alanazi, Yousef Saleh Alanzi.
 
 ---
 
