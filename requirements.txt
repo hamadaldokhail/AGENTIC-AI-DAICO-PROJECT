@@ -1,0 +1,21 @@
+# DAICO Navigator — Python dependencies
+# Tested on Python 3.11–3.13
+
+# --- LLM + orchestration ---
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+langchain-text-splitters>=0.3.0
+langgraph>=0.2.50
+openai>=1.40.0
+
+# --- Data models / env / math ---
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+numpy>=1.26.0
+
+# --- Notebook tooling (to run top-to-bottom and capture output) ---
+jupyter>=1.0.0
+nbformat>=5.9.0
+nbconvert>=7.0.0
+ipykernel>=6.29.0
