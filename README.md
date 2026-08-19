@@ -12,7 +12,7 @@ Functional API**.
 
 ### Team
 - **Hamed Ahmed Aldkhyyal**
-- **Saif Fawaz Alanzie**
+- **Saif Fawaz Alanzi**
 - **Fahad Abdullah Alanazi**
 - **Yousef Farhan Alanzi**
 
