@@ -1,4 +1,4 @@
-# DAICO Center — Enrollment & Certification Policies
+# DAICO Center - Enrollment & Certification Policies
 
 ## Eligibility and Enrollment
 - DAICO courses are open to KSU students and to the public under SDAIA sponsorship.

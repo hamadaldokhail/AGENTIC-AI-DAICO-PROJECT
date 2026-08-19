@@ -16,13 +16,13 @@ def md(src):   cells.append(nbf.v4.new_markdown_cell(src))
 def code(src): cells.append(nbf.v4.new_code_cell(src))
 
 # ---------------------------------------------------------------- header
-md(r'''# DAICO Navigator — an Agentic AI Assistant for the DAICO Center
+md(r'''# DAICO Navigator - an Agentic AI Assistant for the DAICO Center
 
-**Course:** Building Agentic AI Systems (AGT-401) — **Capstone Project**
+**Course:** Building Agentic AI Systems (AGT-401) - **Capstone Project**
 
-**Programme:** SDAIA Academy — *Building Agentic AI Systems*, hosted at **DAICO** (Data & AI Center of Excellence), **King Saud University (KSU)**, sponsored by **SDAIA**
-**Cohort:** 16–20 August 2026 (5 days)
-**Declared track:** **Track A — Supervisor** (with a **Track B** human handoff for enrollment)
+**Programme:** SDAIA Academy - *Building Agentic AI Systems*, hosted at **DAICO** (Data & AI Center of Excellence), **King Saud University (KSU)**, sponsored by **SDAIA**
+**Cohort:** 16-20 August 2026 (5 days)
+**Declared track:** **Track A - Supervisor** (with a **Track B** human handoff for enrollment)
 
 **Team:**
 - Hamed Ahmed Aldkhyyal
@@ -33,7 +33,7 @@ md(r'''# DAICO Navigator — an Agentic AI Assistant for the DAICO Center
 ---
 
 **What it is.** DAICO Navigator is a multi-agent assistant for the DAICO training center. A supervisor LLM
-routes each learner message to one of four workers — **Course Advisor** (real catalog tools), **FAQ**
+routes each learner message to one of four workers - **Course Advisor** (real catalog tools), **FAQ**
 (RAG over center documents), **Capstone Mentor** (RAG over the rubric), and **Enrollment** (human-in-the-loop
 registration). It remembers each learner across conversations and is built on the LangGraph Functional API.''')
 
@@ -47,35 +47,29 @@ md(r'''## How this notebook maps to the 8 rubric sections
 | 4 | Context & state (checkpointer + Store, cross-thread test) | §4 |
 | 5 | Human-in-the-loop (interrupt + resume) | §5 |
 | 6 | Functional API & error handling (@task/@entrypoint + 2 strategies) | §6 |
-| 7 | Workflow pattern (Evaluator–Optimizer, named) | §7 |
+| 7 | Workflow pattern (Evaluator-Optimizer, named) | §7 |
 | 8 | LangSmith observability | §8 |
 
-Sections are presented in **dependency order** (each builds on the last), but every header names its rubric number.
-
-### How to run
-1. `pip install -r requirements.txt`
-2. Copy `.env.example` to `.env` and set `OPENAI_API_KEY` (and optionally `LANGCHAIN_API_KEY` for §8).
-3. **Kernel → Restart & Run All.** Every cell below has captured output.''')
+Sections are presented in **dependency order** (each builds on the last), but every header names its rubric number.''')
 
 # ---------------------------------------------------------------- setup
-md(r'''## Setup — environment, model, and observability switch''')
+md(r'''## Setup - environment, model, and observability switch''')
 
 code(r'''import os, json
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()  # reads OPENAI_API_KEY (and LANGCHAIN_API_KEY if present) from the git-ignored .env
-assert os.environ.get("OPENAI_API_KEY"), "Set OPENAI_API_KEY in your .env file"
+load_dotenv()
+assert os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY is not set"
 
-# --- Rubric §8: LangSmith tracing. NOTE the correct variable name LANGCHAIN_TRACING_V2. ---
-# We only turn tracing ON if a LangSmith key is actually present, so the notebook never fails silently.
+# Enable LangSmith tracing when a key is available.
 if os.environ.get("LANGCHAIN_API_KEY"):
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ.setdefault("LANGCHAIN_PROJECT", "daico-navigator")
     print("LangSmith tracing: ON  ->  project:", os.environ["LANGCHAIN_PROJECT"])
 else:
     os.environ["LANGCHAIN_TRACING_V2"] = "false"
-    print("LangSmith tracing: OFF (no LANGCHAIN_API_KEY). See Rubric §8 for how to enable.")
+    print("LangSmith tracing: OFF")
 
 DATA_DIR = Path("data") if Path("data").exists() else (Path("..") / "data")
 print("Data directory:", DATA_DIR.resolve())''')
@@ -89,9 +83,9 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 print("LLM smoke test ->", llm.invoke("Reply with the single word: ready").content)''')
 
 # ---------------------------------------------------------------- S1
-md(r'''## Rubric §1 — Agent fundamentals: real tools + structured output
+md(r'''## Rubric §1 - Agent fundamentals: real tools + structured output
 
-The tools below read the **real** DAICO catalog (`data/courses.json`) and use their arguments — no hardcoded
+The tools below read the **real** DAICO catalog (`data/courses.json`) and use their arguments - no hardcoded
 strings. The model *chooses* which to call. We also show `with_structured_output` returning a Pydantic object
 that downstream **code** parses (not a human).''')
 
@@ -192,7 +186,7 @@ print("Parsed by code ->", "course_id:", rec.course_id, "| prerequisites:", rec.
 print("Reason:", rec.reason)''')
 
 # ---------------------------------------------------------------- S3
-md(r'''## Rubric §3 — RAG pipeline
+md(r'''## Rubric §3 - RAG pipeline
 
 Real DAICO documents are **loaded → split → embedded → stored → retrieved**. We then prove retrieval works by
 asking a question whose answer is *verbatim* in the documents.''')
@@ -237,17 +231,17 @@ code(r'''def rag_answer(question: str) -> str:
 
 print(rag_answer("What attendance percentage is required, and what score does a capstone need to pass?"))''')
 
-md(r'''**RAG design choice — Hybrid RAG.** DAICO answers come from two very different stores: *structured* catalog
-facts (seats, prerequisites — best served by the tools in §1) and *unstructured* prose (policies, FAQ, rubric —
+md(r'''**RAG design choice - Hybrid RAG.** DAICO answers come from two very different stores: *structured* catalog
+facts (seats, prerequisites - best served by the tools in §1) and *unstructured* prose (policies, FAQ, rubric -
 best served by vector retrieval). A pure 2-Step RAG would miss live seat counts; pure Agentic RAG would waste
 tool-calling turns on questions a single retrieval answers well. We therefore use **Hybrid RAG**: the §2
 supervisor decides per message whether to use structured tools (Course Advisor) or vector retrieval (FAQ /
 Capstone Mentor).''')
 
 # ---------------------------------------------------------------- S2
-md(r'''## Rubric §2 — Multi-agent routing (Track A: Supervisor)
+md(r'''## Rubric §2 - Multi-agent routing (Track A: Supervisor)
 
-The routing decision is made by the **LLM** via `with_structured_output` — not by keyword matching. A `Route`
+The routing decision is made by the **LLM** via `with_structured_output` - not by keyword matching. A `Route`
 Pydantic model constrains the destination to four workers.''')
 
 code(r'''class Route(BaseModel):
@@ -273,7 +267,7 @@ for t in tests:
     print("[", d.destination.ljust(15), "]", t, "\n     reason:", d.reason)''')
 
 # ---------------------------------------------------------------- S4
-md(r'''## Rubric §4 — Context & state: checkpointer (short-term) + Store (long-term)
+md(r'''## Rubric §4 - Context & state: checkpointer (short-term) + Store (long-term)
 
 `InMemorySaver` gives each conversation a `thread_id` (short-term). A separate `InMemoryStore` holds durable
 learner facts that must survive across conversations (long-term). The **cross-thread test** below writes a fact
@@ -317,10 +311,10 @@ assert b["questions_asked_total"] == 2, "counter did not persist across threads"
 print("\n[PASS] CROSS-THREAD MEMORY CONFIRMED: a fact written in conv-A was read back in conv-B.")''')
 
 # ---------------------------------------------------------------- S7
-md(r'''## Rubric §7 — Workflow pattern: **Evaluator–Optimizer**
+md(r'''## Rubric §7 - Workflow pattern: **Evaluator-Optimizer**
 
-We implement the **Evaluator–Optimizer** pattern for the Capstone Mentor. It fits because good capstone feedback
-should be *drafted*, then *judged* against the rubric, then *revised* if it is not specific enough — a
+We implement the **Evaluator-Optimizer** pattern for the Capstone Mentor. It fits because good capstone feedback
+should be *drafted*, then *judged* against the rubric, then *revised* if it is not specific enough - a
 generate → judge → refine loop. Built with the Functional API (`@task` / `@entrypoint`).''')
 
 code(r'''class Evaluation(BaseModel):
@@ -363,12 +357,12 @@ flawed_idea = ("A chatbot that answers with if-else keyword rules and keeps a gr
 print(capstone_review_workflow.invoke(flawed_idea)[:600], "...")''')
 
 # ---------------------------------------------------------------- S6
-md(r'''## Rubric §6 — Functional API & error handling
+md(r'''## Rubric §6 - Functional API & error handling
 
 Everything runs on the **Functional API** (`@task` / `@entrypoint`). We implement **two** of the four error
 strategies:
-- **Transient retry** — a real `RetryPolicy` object on a flaky task.
-- **LLM-recoverable** — a structured-output task that feeds a `ValidationError` back to the model and retries.''')
+- **Transient retry** - a real `RetryPolicy` object on a flaky task.
+- **LLM-recoverable** - a structured-output task that feeds a `ValidationError` back to the model and retries.''')
 
 code(r'''from langgraph.types import RetryPolicy
 
@@ -411,7 +405,7 @@ print(classify_demo.invoke("I want to sign up for ML-201", {"configurable": {"th
 print("Error strategy 2 (LLM-recoverable): structured classifier with validation feedback loop.")''')
 
 # ---------------------------------------------------------------- S5
-md(r'''## Rubric §5 — Human-in-the-loop: enrollment (Track B handoff)
+md(r'''## Rubric §5 - Human-in-the-loop: enrollment (Track B handoff)
 
 Enrollment is irreversible-ish (it reserves a sponsored seat), so the agent **pauses** with `interrupt()` and
 waits for a human to approve before committing. The run is completed with `Command(resume=...)`.''')
@@ -502,27 +496,23 @@ print(json.dumps(resumed, indent=2, ensure_ascii=False))
 print("\nLong-term record - Saif's enrolled course:", recall("saif", "enrolled_course"))''')
 
 # ---------------------------------------------------------------- S8
-md(r'''## Rubric §8 — LangSmith observability
+md(r'''## Rubric §8 - LangSmith observability
 
-Tracing is wired to the correct `LANGCHAIN_TRACING_V2` variable and activates automatically when a
-`LANGCHAIN_API_KEY` is present in `.env`. The cell below performs a traced run when enabled.''')
+Tracing uses the `LANGCHAIN_TRACING_V2` variable and runs whenever a LangSmith key is configured. The cell
+below issues a traced run and reports the project it was sent to.''')
 
 code(r'''if os.environ.get("LANGCHAIN_TRACING_V2") == "true":
     _ = daico_navigator.invoke(
         {"user_id": "trace", "question": "What is DAICO and is it free?"},
         {"configurable": {"thread_id": "trace-1"}},
     )
-    print("Traced run complete. View it at https://smith.langchain.com  ->  project:",
-          os.environ.get("LANGCHAIN_PROJECT"))
-    print("In the trace you can inspect the supervisor classification, the chosen worker, and each LLM call.")
+    print("Traced run complete. Project:", os.environ.get("LANGCHAIN_PROJECT"))
+    print("The trace shows the supervisor classification, the chosen worker, and each LLM call.")
 else:
-    print("LangSmith tracing is OFF. To enable Rubric §8 and capture a real trace:")
-    print("  1) Get a free key at https://smith.langchain.com  (Settings -> API Keys)")
-    print("  2) Add LANGCHAIN_API_KEY=... to your .env")
-    print("  3) Kernel -> Restart & Run All, then open the 'daico-navigator' project in LangSmith.")''')
+    print("LangSmith tracing is OFF.")''')
 
 # ---------------------------------------------------------------- end-to-end
-md(r'''## End-to-end demo — routing + cross-thread memory on the real agent''')
+md(r'''## End-to-end demo - routing + cross-thread memory on the real agent''')
 
 code(r'''demo_qs = [
     ("yousef", "Which course teaches building AI agents, and how many seats are left in it?"),
@@ -540,7 +530,7 @@ print("\nCross-thread memory: Yousef's question count across 3 different threads
       recall("yousef", "questions_asked"))''')
 
 # ---------------------------------------------------------------- writeup
-md(r'''## Write-up — one paragraph per rubric section
+md(r'''## Write-up - one paragraph per rubric section
 
 **§1 Agent fundamentals.** Four tools (`search_courses`, `get_course_details`, `check_seat_availability`,
 `get_prerequisites`) read the real `courses.json` and act on their arguments; the model chooses them in a
@@ -548,7 +538,7 @@ tool-calling loop. `CourseRecommendation` (via `with_structured_output`) returns
 parses.
 
 **§2 Multi-agent / routing (Track A).** A supervisor LLM classifies each message with `with_structured_output`
-into a constrained `Route` (four workers). The decision is the model's — there is no keyword matching anywhere.
+into a constrained `Route` (four workers). The decision is the model's - there is no keyword matching anywhere.
 
 **§3 RAG pipeline (Hybrid).** DAICO docs are loaded, split with `RecursiveCharacterTextSplitter`, embedded with
 `text-embedding-3-small`, stored in `InMemoryVectorStore`, and retrieved. A verbatim-answer probe (the 80%
@@ -557,7 +547,7 @@ vector search, and the supervisor picks per message.
 
 **§4 Context & state.** `InMemorySaver` (thread_id) holds short-term conversation state; a separate
 `InMemoryStore` holds long-term learner facts. The cross-thread test writes an interest in `conv-A` and reads
-it back in `conv-B`, with assertions proving persistence — not a growing message list.
+it back in `conv-B`, with assertions proving persistence - not a growing message list.
 
 **§5 Human-in-the-loop.** `enroll_task` calls `interrupt()` before reserving a sponsored seat; the notebook
 shows the paused payload and then `Command(resume="approve")` completing the enrollment. Both halves run.
@@ -566,13 +556,13 @@ shows the paused payload and then `Command(resume="approve")` completing the enr
 implemented: a real `RetryPolicy` on `fetch_seat_snapshot` (transient retry, recovers on attempt 3) and a
 `ValidationError` feedback loop in `classify_message` (LLM-recoverable).
 
-**§7 Workflow pattern.** We use the **Evaluator–Optimizer** pattern for the Capstone Mentor: draft feedback,
+**§7 Workflow pattern.** We use the **Evaluator-Optimizer** pattern for the Capstone Mentor: draft feedback,
 judge it against the rubric with structured output, and revise if the verdict is `revise`.
 
 **§8 LangSmith observability.** Tracing is wired to the correct `LANGCHAIN_TRACING_V2` variable and was run with
 a real LangSmith key, sending traces to the `daico-navigator` project. The trace showed each `daico_navigator`
-run decomposing into its steps — `bump_and_get_count`, then the supervisor `classify_message` call, then the
-selected worker. The supervisor classification is a small, fast call (~170–380 prompt / ~20–40 completion tokens,
+run decomposing into its steps - `bump_and_get_count`, then the supervisor `classify_message` call, then the
+selected worker. The supervisor classification is a small, fast call (~170-380 prompt / ~20-40 completion tokens,
 under ~1s), while the **Course Advisor path is the clear hotspot**: its tool-calling loop issues several
 ChatOpenAI calls, pushing a single root run to ~1k tokens and several seconds, versus FAQ/Capstone answers which
 cost only a classify + one grounded call (~150 tokens, ~1s). The trace made the cost of the multi-step tool loop

@@ -1,4 +1,4 @@
-# DAICO Center — Frequently Asked Questions
+# DAICO Center - Frequently Asked Questions
 
 ## What is DAICO?
 DAICO is the Data & AI Center of Excellence at King Saud University (KSU). It delivers hands-on AI and data training and is sponsored by SDAIA, the Saudi Data and Artificial Intelligence Authority.
